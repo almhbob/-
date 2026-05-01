@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PASSENGER
+  DRIVER
+  ADMIN
+}
+
+enum RideStatus {
+  REQUESTED
+  ACCEPTED
+  ARRIVING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  name      String?
+  role      UserRole @default(PASSENGER)
+  createdAt DateTime @default(now())
+  rides     Ride[]   @relation("PassengerRides")
+  driver    Driver?
+}
+
+model Driver {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  isOnline   Boolean  @default(false)
+  isVerified Boolean  @default(false)
+  vehicle    Vehicle?
+  rides      Ride[]   @relation("DriverRides")
+  createdAt  DateTime @default(now())
+}
+
+model Vehicle {
+  id       String  @id @default(cuid())
+  driverId String  @unique
+  driver   Driver  @relation(fields: [driverId], references: [id])
+  plateNo  String?
+  color    String?
+  model    String?
+}
+
+model Zone {
+  id         String @id @default(cuid())
+  name       String @unique
+  multiplier Float  @default(1)
+}
+
+model PricingRule {
+  id          String  @id @default(cuid())
+  baseFare    Int     @default(500)
+  perKmFare   Int     @default(300)
+  minimumFare Int     @default(1000)
+  active      Boolean @default(true)
+}
+
+model Ride {
+  id               String     @id @default(cuid())
+  passengerId      String
+  passenger        User       @relation("PassengerRides", fields: [passengerId], references: [id])
+  driverId         String?
+  driver           Driver?    @relation("DriverRides", fields: [driverId], references: [id])
+  pickupLabel      String
+  destinationLabel String
+  distanceKm       Float      @default(2)
+  estimatedFare    Int
+  finalFare        Int?
+  status           RideStatus @default(REQUESTED)
+  rating           Int?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
