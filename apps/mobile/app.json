@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "JUMBAK",
+    "slug": "jumbak",
+    "scheme": "jumbak",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.almhbob.jumbak",
+      "adaptiveIcon": {
+        "backgroundColor": "#063B63"
+      }
+    },
+    "plugins": ["expo-router"]
+  }
+}
